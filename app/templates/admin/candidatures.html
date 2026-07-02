@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Candidatures — BarakaSN Admin{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap">
+
+  <div class="flex items-center gap-3 mb-6">
+    <a href="{{ url_for('admin.dashboard') }}" class="text-gray-400 hover:text-vert">← Admin</a>
+    <span class="text-gray-300">/</span>
+    <h1 class="font-display text-xl font-bold">Candidatures bénévoles</h1>
+  </div>
+
+  <!-- Onglets -->
+  <div class="flex gap-2 overflow-x-auto pb-2 mb-6">
+    {% for s, label in [('en_attente','⏳ En attente'), ('accepte','✅ Acceptées'), ('refuse','❌ Refusées')] %}
+    <a href="{{ url_for('admin.candidatures', statut=s) }}"
+       class="shrink-0 px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all
+              {% if statut_filtre == s %}bg-vert border-vert text-white{% else %}bg-white border-gray-200 text-gray-600{% endif %}">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  {% if candidatures %}
+  <div class="flex flex-col gap-3">
+    {% for c in candidatures %}
+    <div class="card p-5 flex flex-col md:flex-row md:items-center gap-4">
+      <div class="flex-1 min-w-0">
+        <!-- Mission -->
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-sm font-bold text-gray-800">{{ c.mission.titre }}</span>
+          <span class="badge badge-volontariat text-xs">{{ c.mission.structure.nom }}</span>
+        </div>
+        <!-- Candidat -->
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <div class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-vert shrink-0">
+            {{ c.benevole.nom[0].upper() }}
+          </div>
+          <span class="font-medium">{{ c.benevole.nom }}</span>
+          <span class="text-gray-400">·</span>
+          <span class="text-gray-400 text-xs">{{ c.benevole.email }}</span>
+        </div>
+        {% if c.message %}
+          <div class="mt-2 bg-gray-50 rounded-lg p-3 text-sm text-gray-600 italic">
+            "{{ c.message }}"
+          </div>
+        {% endif %}
+        <div class="text-xs text-gray-400 mt-2">
+          📅 {{ c.created_at.strftime('%d/%m/%Y à %H:%M') }}
+        </div>
+      </div>
+
+      {% if statut_filtre == 'en_attente' %}
+      <div class="flex gap-2 shrink-0">
+        <form method="POST" action="{{ url_for('admin.accepter_candidature', id=c.id) }}">
+          <button type="submit" class="btn-primary text-sm py-2 px-4">✅ Accepter</button>
+        </form>
+        <form method="POST" action="{{ url_for('admin.refuser_candidature', id=c.id) }}">
+          <button type="submit" class="text-sm py-2 px-4 rounded-lg border-2 border-red-200 text-red-600 hover:bg-red-50 font-semibold">❌ Refuser</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-12 text-gray-500">
+    <div class="text-4xl mb-3">📭</div>
+    <p>Aucune candidature dans cette catégorie.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

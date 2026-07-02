@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Publier un don — BarakaSN{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap flex justify-center">
+  <div class="w-full max-w-lg">
+    <div class="mb-7">
+      <h1 class="font-display text-2xl font-bold">📢 Publier une annonce</h1>
+      <p class="text-gray-500 text-sm mt-1">Votre annonce sera visible après modération (sous 24h)</p>
+    </div>
+
+    <div class="card p-6 md:p-8">
+      <form method="POST" action="{{ url_for('dons.creer_annonce') }}"
+            enctype="multipart/form-data" novalidate>
+
+        <!-- TYPE DE DON -->
+        <div class="form-group">
+          <label class="form-label">Type de don *</label>
+          <div class="grid grid-cols-3 gap-2">
+            {% for val, icon, label in [('habits','👕','Habits'), ('alimentation','🍚','Alimentation'), ('cosmetique','🧴','Hygiène')] %}
+            <label class="flex flex-col items-center gap-1 border-2 border-gray-200 rounded-xl p-3 cursor-pointer
+                          transition-all hover:border-vert has-[:checked]:border-vert has-[:checked]:bg-green-50 text-center">
+              <input type="radio" name="categorie" value="{{ val }}" class="sr-only"
+                     onchange="updateSousCat(this.value)" required>
+              <span class="text-2xl">{{ icon }}</span>
+              <span class="text-xs font-semibold text-gray-700">{{ label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- SOUS-CATÉGORIE DYNAMIQUE -->
+        <div class="form-group" id="bloc-habits" style="display:none">
+          <label class="form-label">Pour qui ?</label>
+          <div class="flex gap-2 flex-wrap">
+            {% for val, label in [('enfants','👶 Enfants'), ('hommes','👔 Hommes'), ('femmes','👗 Femmes')] %}
+            <label class="flex items-center gap-2 border-2 border-gray-200 rounded-xl px-3 py-2 cursor-pointer
+                          text-sm font-semibold hover:border-vert has-[:checked]:border-vert has-[:checked]:bg-green-50">
+              <input type="radio" name="sous_categorie" value="{{ val }}" class="accent-vert">
+              {{ label }}
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- TITRE -->
+        <div class="form-group">
+          <label class="form-label" for="titre">Titre de l'annonce *</label>
+          <input class="form-input" type="text" id="titre" name="titre"
+                 placeholder="ex: 10 vêtements enfants taille 6 ans" required maxlength="200">
+          <p class="text-xs text-gray-400 mt-1">Soyez précis : quantité, état, taille…</p>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="form-group">
+          <label class="form-label" for="description">Description</label>
+          <textarea class="form-input" id="description" name="description" rows="3"
+                    placeholder="Décrivez l'état, la quantité, comment récupérer…"></textarea>
+        </div>
+
+        <!-- PHOTO -->
+        <div class="form-group">
+          <label class="form-label">Photo (optionnelle)</label>
+          <div id="upload-zone"
+               class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer
+                      hover:border-vert hover:bg-green-50 transition-all"
+               onclick="document.getElementById('image').click()">
+            <div id="upload-placeholder">
+              <div class="text-3xl mb-2">📷</div>
+              <p class="text-sm text-gray-500 font-medium">Cliquez pour ajouter une photo</p>
+              <p class="text-xs text-gray-400 mt-1">PNG, JPG, WEBP — max 5 Mo</p>
+            </div>
+            <img id="image-preview" src="" alt="Aperçu"
+                 class="hidden w-full max-h-48 object-cover rounded-lg mx-auto">
+          </div>
+          <input type="file" id="image" name="image" accept="image/*" class="hidden"
+                 onchange="previewImage(this)">
+        </div>
+
+        <!-- LOCALISATION -->
+        <div class="form-group">
+          <label class="form-label" for="localisation_id">Votre zone</label>
+          <select class="form-input" id="localisation_id" name="localisation_id">
+            <option value="">-- Choisir une zone --</option>
+            {% set current_region = namespace(val='') %}
+            {% for loc in localisations %}
+              {% if loc.region != current_region.val %}
+                {% set current_region.val = loc.region %}
+                <optgroup label="── {{ loc.region }} ──">
+              {% endif %}
+              <option value="{{ loc.id }}">
+                {{ loc.ville }}{% if loc.quartier %} · {{ loc.quartier }}{% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button type="submit" class="btn-primary w-full mt-2">
+          Soumettre mon annonce →
+        </button>
+      </form>
+    </div>
+
+    <p class="text-center text-xs text-gray-400 mt-4">
+      🔒 Votre email ne sera partagé qu'avec les personnes qui vous contactent.
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateSousCat(val) {
+  document.getElementById('bloc-habits').style.display = val === 'habits' ? 'block' : 'none';
+}
+
+function previewImage(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const preview = document.getElementById('image-preview');
+    const placeholder = document.getElementById('upload-placeholder');
+    preview.src = e.target.result;
+    preview.classList.remove('hidden');
+    placeholder.classList.add('hidden');
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// Drag & drop sur mobile et desktop
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('border-vert','bg-green-50'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('border-vert','bg-green-50'));
+zone.addEventListener('drop', e => {
+  e.preventDefault();
+  zone.classList.remove('border-vert','bg-green-50');
+  const input = document.getElementById('image');
+  input.files = e.dataTransfer.files;
+  previewImage(input);
+});
+</script>
+{% endblock %}

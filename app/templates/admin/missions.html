@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Missions — BarakaSN Admin{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap">
+
+  <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+    <div class="flex items-center gap-3">
+      <a href="{{ url_for('admin.dashboard') }}" class="text-gray-400 hover:text-vert">← Admin</a>
+      <span class="text-gray-300">/</span>
+      <h1 class="font-display text-xl font-bold">Missions de volontariat</h1>
+    </div>
+    <a href="{{ url_for('admin.ajouter_mission') }}" class="btn-primary text-sm">+ Ajouter une mission</a>
+  </div>
+
+  {% if missions %}
+  <div class="flex flex-col gap-3">
+    {% for m in missions %}
+    <div class="card p-5 flex flex-col md:flex-row md:items-center gap-4">
+      <div class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <span class="font-bold text-gray-800">{{ m.titre }}</span>
+          <span class="badge {% if m.active %}badge-volontariat{% else %}bg-gray-100 text-gray-500{% endif %}">
+            {% if m.active %}Active{% else %}Inactive{% endif %}
+          </span>
+          <span class="badge bg-blue-50 text-blue-700">{{ m.places_disponibles }} place{{ 's' if m.places_disponibles != 1 }}</span>
+        </div>
+        <div class="text-sm text-vert font-medium">{{ m.structure.nom }}</div>
+        {% if m.localisation %}
+          <div class="text-xs text-gray-500 mt-1">📍 {{ m.localisation }}</div>
+        {% endif %}
+        {% if m.date_debut %}
+          <div class="text-xs text-gray-400 mt-1">
+            📅 {{ m.date_debut.strftime('%d/%m/%Y') }}{% if m.date_fin %} → {{ m.date_fin.strftime('%d/%m/%Y') }}{% endif %}
+          </div>
+        {% endif %}
+        <div class="text-xs text-gray-500 mt-1">
+          👥 {{ m.candidatures|length }} candidature{{ 's' if m.candidatures|length != 1 }}
+        </div>
+      </div>
+      <div class="flex gap-2 shrink-0">
+        <form method="POST" action="{{ url_for('admin.toggle_mission', id=m.id) }}">
+          <button type="submit" class="text-sm px-3 py-2 rounded-lg border-2 font-semibold transition-colors
+            {% if m.active %}border-gray-200 text-gray-500 hover:bg-gray-50{% else %}border-green-200 text-green-600 hover:bg-green-50{% endif %}">
+            {% if m.active %}⏸ Désactiver{% else %}▶ Activer{% endif %}
+          </button>
+        </form>
+        <form method="POST" action="{{ url_for('admin.supprimer_mission', id=m.id) }}"
+              onsubmit="return confirm('Supprimer cette mission ?')">
+          <button type="submit" class="text-sm px-3 py-2 rounded-lg border-2 border-red-200 text-red-500 hover:bg-red-50 font-semibold">
+            🗑
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-16">
+    <div class="text-5xl mb-3">🎯</div>
+    <p class="text-gray-500 mb-4">Aucune mission créée.</p>
+    <a href="{{ url_for('admin.ajouter_mission') }}" class="btn-primary">Créer la première mission</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

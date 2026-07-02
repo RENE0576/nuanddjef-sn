@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Habits — BarakaSN{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap">
+
+  <!-- En-tête -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="font-display text-2xl md:text-3xl font-bold">👕 Dons d'habits</h1>
+      <p class="text-gray-500 text-sm mt-1">{{ annonces|length }} annonce{{ 's' if annonces|length != 1 }} disponible{{ 's' if annonces|length != 1 }}</p>
+    </div>
+    <a href="{{ url_for('dons.creer_annonce') }}" class="btn-primary shrink-0">+ Publier un don</a>
+  </div>
+
+  <!-- Filtres pills (scroll horizontal sur mobile) -->
+  <div class="flex gap-2 overflow-x-auto pb-2 mb-6 snap-x">
+    {% set cats = [('', 'Tout voir'), ('enfants', '👶 Enfants'), ('hommes', '👔 Hommes'), ('femmes', '👗 Femmes')] %}
+    {% for val, label in cats %}
+    <a href="{{ url_for('dons.habits', sous_categorie=val) }}"
+       class="shrink-0 snap-start px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all
+              {% if filtre == val %}bg-vert border-vert text-white{% else %}bg-white border-gray-200 text-gray-600 hover:border-vert{% endif %}">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Grille d'annonces -->
+  {% if annonces %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    {% for annonce in annonces %}
+    <div class="card p-4 flex flex-col gap-3">
+      {% if annonce.image %}
+        <img src="{{ url_for('static', filename='img/uploads/' + annonce.image) }}"
+             alt="{{ annonce.titre }}" class="w-full h-40 object-cover rounded-lg">
+      {% else %}
+        <div class="w-full h-32 bg-blue-50 rounded-lg flex items-center justify-center text-5xl">👕</div>
+      {% endif %}
+      <div class="flex items-center justify-between">
+        <span class="badge badge-habits">{{ annonce.sous_categorie|capitalize if annonce.sous_categorie else 'Habits' }}</span>
+        <span class="text-xs text-gray-400">{{ annonce.created_at.strftime('%d/%m/%Y') }}</span>
+      </div>
+      <h3 class="font-semibold text-gray-800">{{ annonce.titre }}</h3>
+      {% if annonce.description %}
+        <p class="text-sm text-gray-500 line-clamp-2">{{ annonce.description }}</p>
+      {% endif %}
+      <div class="mt-auto pt-3 border-t border-gray-50 flex items-center justify-between">
+        <div class="text-xs text-gray-400">
+          👤 {{ annonce.auteur.nom }}
+          {% if annonce.localisation %}<br>📍 {{ annonce.localisation.ville }}{% endif %}
+        </div>
+        <button class="btn-primary text-xs py-2 px-3">Contacter</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-16">
+    <div class="text-5xl mb-4">🔍</div>
+    <h3 class="font-semibold text-gray-700 mb-2">Aucune annonce pour l'instant</h3>
+    <p class="text-gray-500 text-sm mb-5">Soyez le premier à proposer des vêtements !</p>
+    <a href="{{ url_for('dons.creer_annonce') }}" class="btn-primary">Publier une annonce</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

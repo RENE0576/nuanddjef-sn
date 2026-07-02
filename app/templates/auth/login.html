@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Connexion — BarakaSN{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap flex justify-center">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="text-4xl mb-3">👋</div>
+      <h1 class="font-display text-2xl font-bold">Bon retour !</h1>
+      <p class="text-gray-500 text-sm mt-1">Connectez-vous pour accéder à votre espace</p>
+    </div>
+    <div class="card p-6 md:p-8">
+      <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="email">Adresse email</label>
+          <input class="form-input" type="email" id="email" name="email"
+                 placeholder="vous@exemple.sn" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Mot de passe</label>
+          <input class="form-input" type="password" id="password" name="password"
+                 placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-primary w-full mt-2">Se connecter</button>
+      </form>
+    </div>
+    <p class="text-center text-sm text-gray-500 mt-4">
+      Pas encore de compte ?
+      <a href="{{ url_for('auth.inscription') }}" class="text-vert font-semibold hover:underline">S'inscrire gratuitement</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Ñu andd jëf Sénégal — Dons & Volontariat{% endblock %}
+
+{% block content %}
+
+<!-- ══ HERO ══════════════════════════════════════════════════════════════ -->
+<section class="relative text-white overflow-hidden" style="min-height: 420px;">
+
+  <!-- Image de fond -->
+  <img src="/static/img/uploads/hero.jpg"
+       alt="Enfants Sénégal"
+       style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center top; z-index:0;">
+
+  <!-- Filtre sombre pour faire ressortir les textes blancs et jaunes -->
+  <div style="position:absolute; inset:0; background:rgba(0,0,0,0.4); z-index:1;"></div>
+
+  <!-- Contenu par dessus -->
+  <div class="page-wrap py-12 md:py-20 flex flex-col md:flex-row items-center gap-8" style="position:relative; z-index:2;">
+    <div class="flex-1 text-center md:text-left">
+      <span class="inline-block bg-white/10 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4">
+        🇸🇳 Solidarité Sénégalaise
+      </span>
+      <h1 class="font-display text-3xl md:text-5xl font-black leading-tight mb-4">
+        Un petit geste de bonté<br><span class="text-or">peut illuminer une grande journée.</span>
+      </h1>
+      <p class="text-gray-200 text-base md:text-lg mb-8 max-w-md mx-auto md:mx-0">
+        Habits, produits, argent ou temps — trouvez comment aider les structures et personnes qui en ont besoin au Sénégal.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+        <a href="{{ url_for('dons.habits') }}" class="btn-or">Je veux donner →</a>
+        <a href="{{ url_for('volontariat.index') }}" class="btn-outline" style="border-color:white; color:white;">Devenir bénévole</a>
+      </div>
+    </div>
+    <!-- Compteurs -->
+    <div class="grid grid-cols-3 gap-3 md:gap-4 w-full md:w-auto md:shrink-0">
+      <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+        <div class="font-display text-3xl md:text-4xl font-black text-or">{{ stats.annonces }}</div>
+        <div class="text-xs text-gray-200 mt-1 font-medium">Annonces<br>actives</div>
+      </div>
+      <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+        <div class="font-display text-3xl md:text-4xl font-black text-or">{{ stats.structures }}</div>
+        <div class="text-xs text-gray-200 mt-1 font-medium">Structures<br>vérifiées</div>
+      </div>
+      <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+        <div class="font-display text-3xl md:text-4xl font-black text-or">{{ stats.missions }}</div>
+        <div class="text-xs text-gray-200 mt-1 font-medium">Missions<br>ouvertes</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 4 CATÉGORIES ═══════════════════════════════════════════════════════ -->
+<section class="page-wrap section-gap">
+  <h2 class="font-display text-2xl md:text-3xl font-bold text-center mb-2">Comment voulez-vous aider ?</h2>
+  <p class="text-gray-500 text-center mb-8 text-sm md:text-base">Choisissez une catégorie pour commencer</p>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+
+    <a href="{{ url_for('dons.habits') }}"
+       class="card p-5 md:p-6 flex flex-col items-center text-center gap-3 group cursor-pointer">
+      <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-blue-50 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">👕</div>
+      <div>
+        <div class="font-bold text-sm md:text-base text-gray-800">Habits</div>
+        <div class="text-xs text-gray-500 mt-1 hidden md:block">Vêtements pour enfants, hommes et femmes</div>
+      </div>
+      <span class="badge badge-habits mt-auto">Voir les annonces</span>
+    </a>
+
+    <a href="{{ url_for('dons.produits') }}"
+       class="card p-5 md:p-6 flex flex-col items-center text-center gap-3 group cursor-pointer">
+      <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-orange-50 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">🛍</div>
+      <div>
+        <div class="font-bold text-sm md:text-base text-gray-800">Produits</div>
+        <div class="text-xs text-gray-500 mt-1 hidden md:block">Alimentation et hygiène / cosmétique</div>
+      </div>
+      <span class="badge badge-alimentation mt-auto">Voir les annonces</span>
+    </a>
+
+    <a href="{{ url_for('dons.argent') }}"
+       class="card p-5 md:p-6 flex flex-col items-center text-center gap-3 group cursor-pointer">
+      <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-yellow-50 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">💰</div>
+      <div>
+        <div class="font-bold text-sm md:text-base text-gray-800">Argent</div>
+        <div class="text-xs text-gray-500 mt-1 hidden md:block">Daaras, hôpitaux, mosquées vérifiés</div>
+      </div>
+      <span class="badge badge-argent mt-auto">Faire un don</span>
+    </a>
+
+    <a href="{{ url_for('volontariat.index') }}"
+       class="card p-5 md:p-6 flex flex-col items-center text-center gap-3 group cursor-pointer">
+      <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-blue-50 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">🤝</div>
+      <div>
+        <div class="font-bold text-sm md:text-base text-gray-800">Volontariat</div>
+        <div class="text-xs text-gray-500 mt-1 hidden md:block">Missions dans des ONG et centres partenaires</div>
+      </div>
+      <span class="badge badge-volontariat mt-auto">Voir les missions</span>
+    </a>
+
+  </div>
+</section>
+
+<!-- ══ DERNIÈRES ANNONCES ═════════════════════════════════════════════════ -->
+{% if dernieres_annonces %}
+<section class="page-wrap pb-10">
+  <div class="flex items-center justify-between mb-5">
+    <h2 class="font-display text-xl md:text-2xl font-bold">Dernières annonces</h2>
+    <a href="{{ url_for('dons.habits') }}" class="text-sm text-vert font-semibold hover:underline">Tout voir →</a>
+  </div>
+  <div class="flex gap-3 overflow-x-auto pb-3 md:grid md:grid-cols-3 md:overflow-visible snap-x snap-mandatory">
+    {% for annonce in dernieres_annonces %}
+    <a href="#" class="card shrink-0 w-64 md:w-auto snap-start p-4 flex flex-col gap-2 block">
+      <div class="flex items-center justify-between">
+        <span class="badge badge-{{ annonce.categorie }}">{{ annonce.categorie|capitalize }}</span>
+        <span class="text-xs text-gray-400">{{ annonce.created_at.strftime('%d/%m') }}</span>
+      </div>
+      <div class="font-semibold text-sm text-gray-800 line-clamp-2">{{ annonce.titre }}</div>
+      {% if annonce.sous_categorie %}
+        <div class="text-xs text-gray-500">{{ annonce.sous_categorie|capitalize }}</div>
+      {% endif %}
+      <div class="mt-auto pt-2 border-t border-gray-50 text-xs text-gray-400">
+        👤 {{ annonce.auteur.nom }}
+        {% if annonce.localisation %} · 📍 {{ annonce.localisation.ville }}{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ══ CTA PUBLIER ════════════════════════════════════════════════════════ -->
+<section class="bg-or/10 border-y border-or/20">
+  <div class="page-wrap py-10 text-center">
+    <div class="text-4xl mb-3">📢</div>
+    <h2 class="font-display text-xl md:text-2xl font-bold mb-2">Vous avez quelque chose à donner ?</h2>
+    <p class="text-gray-600 text-sm mb-5 max-w-sm mx-auto">Publiez une annonce en 2 minutes et mettez en relation vos dons avec ceux qui en ont besoin.</p>
+    <a href="{{ url_for('dons.creer_annonce') }}" class="btn-primary">Publier une annonce gratuite</a>
+  </div>
+</section>
+
+{% endblock %}

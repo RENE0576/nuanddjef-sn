@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Ajouter une mission — Admin{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap flex justify-center">
+  <div class="w-full max-w-xl">
+
+    <div class="flex items-center gap-3 mb-7">
+      <a href="{{ url_for('admin.missions') }}" class="text-gray-400 hover:text-vert text-sm">← Retour</a>
+      <span class="text-gray-300">/</span>
+      <h1 class="font-display text-xl font-bold">Ajouter une mission</h1>
+    </div>
+
+    <div class="card p-6 md:p-8">
+      <form method="POST" action="{{ url_for('admin.ajouter_mission') }}" novalidate>
+
+        <div class="form-group">
+          <label class="form-label" for="titre">Titre de la mission *</label>
+          <input class="form-input" type="text" id="titre" name="titre"
+                 placeholder="ex: Soutien scolaire — Centre Estel" required maxlength="200">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="structure_id">Structure partenaire *</label>
+          <select class="form-input" id="structure_id" name="structure_id" required>
+            <option value="">-- Choisir une structure --</option>
+            {% for s in structures %}
+            <option value="{{ s.id }}">{{ s.nom }} ({{ s.type }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">Description *</label>
+          <textarea class="form-input" id="description" name="description" rows="4"
+                    placeholder="Décrivez les tâches, le déroulement, l'impact attendu…" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="competences">Compétences / profil recherché</label>
+          <input class="form-input" type="text" id="competences" name="competences_requises"
+                 placeholder="ex: Pédagogie, Niveau Bac, Disponible le weekend">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="form-group">
+            <label class="form-label" for="date_debut">Date de début</label>
+            <input class="form-input" type="date" id="date_debut" name="date_debut">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="date_fin">Date de fin</label>
+            <input class="form-input" type="date" id="date_fin" name="date_fin">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="places">Nombre de places disponibles</label>
+          <input class="form-input" type="number" id="places" name="places_disponibles"
+                 value="5" min="1" max="500">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="localisation_id">Localisation</label>
+          <select class="form-input" id="localisation_id" name="localisation_id">
+            <option value="">-- Choisir --</option>
+            {% for loc in localisations %}
+            <option value="{{ loc.id }}">{{ loc }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button type="submit" class="btn-primary w-full">✅ Créer la mission</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

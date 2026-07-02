@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}{{ mission.titre }} — Ñu andd jëfSN{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap">
+
+  <a href="{{ url_for('volontariat.index') }}" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-vert mb-5">
+    ← Retour aux missions
+  </a>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- Colonne principale -->
+    <div class="md:col-span-2 flex flex-col gap-4">
+      <div class="card p-6">
+        <div class="flex items-start gap-4 mb-4">
+          <div class="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center text-3xl shrink-0">🤝</div>
+          <div>
+            <h1 class="font-display text-xl md:text-2xl font-bold">{{ mission.titre }}</h1>
+            <div class="text-vert font-semibold text-sm mt-1">{{ mission.structure.nom }}</div>
+          </div>
+        </div>
+
+        {% if mission.localisation %}
+          <div class="flex items-center gap-2 text-sm text-gray-600 mb-3">
+            <span>📍</span> {{ mission.localisation }}
+          </div>
+        {% endif %}
+
+        <div class="flex flex-wrap gap-2 mb-4">
+          {% if mission.places_disponibles > 0 %}
+            <span class="badge badge-volontariat">{{ mission.places_disponibles }} place{{ 's' if mission.places_disponibles != 1 }}</span>
+          {% else %}
+            <span class="badge bg-red-100 text-red-700">Mission complète</span>
+          {% endif %}
+          {% if mission.date_debut %}
+            <span class="badge bg-gray-100 text-gray-700">📅 {{ mission.date_debut.strftime('%d/%m/%Y') }}{% if mission.date_fin %} → {{ mission.date_fin.strftime('%d/%m/%Y') }}{% endif %}</span>
+          {% endif %}
+        </div>
+
+        {% if mission.description %}
+          <h2 class="font-semibold mb-2">Description</h2>
+          <p class="text-gray-600 text-sm leading-relaxed">{{ mission.description }}</p>
+        {% endif %}
+
+        {% if mission.competences_requises %}
+          <div class="mt-4 bg-yellow-50 rounded-xl p-4">
+            <h3 class="font-semibold text-sm mb-1">🎯 Compétences recherchées</h3>
+            <p class="text-sm text-gray-700">{{ mission.competences_requises }}</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Info structure -->
+      <div class="card p-5">
+        <h2 class="font-semibold mb-3">À propos de {{ mission.structure.nom }}</h2>
+        {% if mission.structure.description %}
+          <p class="text-sm text-gray-600">{{ mission.structure.description }}</p>
+        {% endif %}
+        {% if mission.structure.contact %}
+          <div class="mt-3 text-sm text-gray-500">📞 {{ mission.structure.contact }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Colonne candidature -->
+    <div class="md:col-span-1">
+      <div class="card p-5 md:sticky md:top-20">
+        <h2 class="font-display text-lg font-bold mb-4">Postuler à cette mission</h2>
+
+        {% if deja_candidat %}
+          <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+            <div class="text-2xl mb-2">✅</div>
+            <p class="text-sm font-semibold text-green-700">Candidature envoyée !</p>
+            <p class="text-xs text-green-600 mt-1">Vous recevrez une réponse de la structure.</p>
+          </div>
+
+        {% elif not current_user.is_authenticated %}
+          <div class="bg-orange-50 rounded-xl p-4 text-center mb-3">
+            <p class="text-sm text-orange-700 mb-3">Connectez-vous pour postuler à cette mission.</p>
+            <a href="{{ url_for('auth.login') }}" class="btn-primary w-full text-center block">Se connecter</a>
+          </div>
+          <a href="{{ url_for('auth.inscription') }}" class="btn-outline w-full text-center block mt-2">S'inscrire gratuitement</a>
+
+        {% elif mission.places_disponibles <= 0 %}
+          <div class="bg-red-50 rounded-xl p-4 text-center">
+            <div class="text-2xl mb-2">😔</div>
+            <p class="text-sm text-red-700">Cette mission est complète.</p>
+          </div>
+
+        {% else %}
+          <form method="POST" action="{{ url_for('volontariat.postuler', mission_id=mission.id) }}">
+            <div class="form-group">
+              <label class="form-label" for="message">Votre motivation (optionnel)</label>
+              <textarea class="form-input" id="message" name="message"
+                        rows="4" placeholder="Expliquez pourquoi vous souhaitez participer à cette mission…"></textarea>
+            </div>
+            <button type="submit" class="btn-primary w-full">Envoyer ma candidature</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

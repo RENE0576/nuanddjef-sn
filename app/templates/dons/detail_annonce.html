@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}{{ annonce.titre }} — BarakaSN{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap">
+
+  <!-- Fil d'Ariane -->
+  <div class="flex items-center gap-2 text-sm text-gray-400 mb-5">
+    <a href="{{ url_for('main.index') }}" class="hover:text-vert">Accueil</a>
+    <span>/</span>
+    <a href="{{ url_for('dons.' + ('habits' if annonce.categorie == 'habits' else 'produits')) }}"
+       class="hover:text-vert capitalize">{{ annonce.categorie }}</a>
+    <span>/</span>
+    <span class="text-gray-600 truncate">{{ annonce.titre }}</span>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Image -->
+    <div>
+      {% if annonce.image %}
+        <img src="{{ url_for('static', filename='img/uploads/' + annonce.image) }}"
+             alt="{{ annonce.titre }}"
+             class="w-full rounded-2xl object-cover max-h-80 md:max-h-96">
+      {% else %}
+        <div class="w-full h-52 md:h-80 rounded-2xl flex items-center justify-center text-7xl
+                    {% if annonce.categorie == 'habits' %}bg-blue-50
+                    {% elif annonce.categorie == 'alimentation' %}bg-orange-50
+                    {% else %}bg-purple-50{% endif %}">
+          {% if annonce.categorie == 'habits' %}👕
+          {% elif annonce.categorie == 'alimentation' %}🍚
+          {% else %}🧴{% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Infos -->
+    <div class="flex flex-col gap-4">
+      <div>
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="badge badge-{{ annonce.categorie }}">{{ annonce.categorie|capitalize }}</span>
+          {% if annonce.sous_categorie %}
+            <span class="badge bg-gray-100 text-gray-600">{{ annonce.sous_categorie|capitalize }}</span>
+          {% endif %}
+        </div>
+        <h1 class="font-display text-2xl md:text-3xl font-bold text-gray-900">{{ annonce.titre }}</h1>
+        <p class="text-xs text-gray-400 mt-1">Publié le {{ annonce.created_at.strftime('%d/%m/%Y') }}</p>
+      </div>
+
+      {% if annonce.description %}
+      <div class="bg-gray-50 rounded-xl p-4">
+        <h2 class="font-semibold text-sm text-gray-700 mb-2">Description</h2>
+        <p class="text-gray-600 text-sm leading-relaxed">{{ annonce.description }}</p>
+      </div>
+      {% endif %}
+
+      <!-- Localisation -->
+      {% if annonce.localisation %}
+      <div class="flex items-center gap-2 text-sm text-gray-600">
+        <span class="text-xl">📍</span>
+        <span>{{ annonce.localisation.quartier and annonce.localisation.quartier + ', ' or '' }}{{ annonce.localisation.ville }} — {{ annonce.localisation.region }}</span>
+      </div>
+      {% endif %}
+
+      <!-- Donateur -->
+      <div class="card p-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-vert flex items-center justify-center text-white font-bold shrink-0">
+          {{ annonce.auteur.nom[0].upper() }}
+        </div>
+        <div>
+          <div class="font-semibold text-sm">{{ annonce.auteur.nom }}</div>
+          <div class="text-xs text-gray-400">Donateur</div>
+        </div>
+      </div>
+
+      <!-- CTA contact -->
+      {% if current_user.is_authenticated and current_user.id != annonce.utilisateur_id %}
+        <a href="mailto:{{ annonce.auteur.email }}?subject=Don : {{ annonce.titre }}&body=Bonjour {{ annonce.auteur.nom }},%0A%0AJ'ai vu votre annonce sur BarakaSN et je suis intéressé(e) par : {{ annonce.titre }}%0A%0ACordialement"
+           class="btn-primary w-full text-center">
+          📧 Contacter le donateur
+        </a>
+      {% elif not current_user.is_authenticated %}
+        <div class="bg-orange-50 rounded-xl p-4 text-center">
+          <p class="text-sm text-orange-700 mb-3">Connectez-vous pour contacter le donateur.</p>
+          <a href="{{ url_for('auth.login') }}" class="btn-primary w-full block text-center">Se connecter</a>
+        </div>
+      {% else %}
+        <!-- C'est l'annonce du user connecté -->
+        <div class="bg-green-50 rounded-xl p-4 text-center">
+          <p class="text-sm text-green-700 font-semibold">📢 C'est votre annonce</p>
+          <div class="flex gap-2 mt-3">
+            <form method="POST" action="{{ url_for('dons.terminer_annonce', id=annonce.id) }}" class="flex-1">
+              <button type="submit" class="btn-primary w-full text-sm py-2">✅ Marquer comme terminé</button>
+            </form>
+            <form method="POST" action="{{ url_for('dons.supprimer_annonce', id=annonce.id) }}"
+                  onsubmit="return confirm('Supprimer cette annonce ?')" class="flex-1">
+              <button type="submit" class="w-full text-sm py-2 px-4 rounded-lg border-2 border-red-200 text-red-500 hover:bg-red-50 font-semibold">🗑 Supprimer</button>
+            </form>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Annonces similaires -->
+  <div class="mt-12">
+    <h2 class="font-display text-xl font-bold mb-4">Annonces similaires</h2>
+    <p class="text-sm text-gray-400">
+      <a href="{{ url_for('dons.' + ('habits' if annonce.categorie == 'habits' else 'produits')) }}"
+         class="text-vert hover:underline font-medium">← Voir toutes les annonces {{ annonce.categorie }}</a>
+    </p>
+  </div>
+
+</div>
+{% endblock %}

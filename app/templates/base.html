@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#800020" />
+  <meta name="description" content="{% block meta_description %}Ñu andd jëf SN centralise la solidarité au Sénégal : donnez des habits, des produits ou de l'argent, ou devenez bénévole auprès de structures vérifiées (daaras, hôpitaux, mosquées).{% endblock %}" />
+  <meta property="og:title" content="{% block og_title %}Ñu andd jëf SN — Dons & Volontariat au Sénégal{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}Centraliser la solidarité au Sénégal : dons d'habits, de produits, d'argent et missions de volontariat.{% endblock %}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="fr_SN" />
+  <title>{% block title %}Ñu andd jëf Sénégal — Dons & Volontariat{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --or: rgb(0, 0, 128);
+      --vert: rgb(219, 25, 25);
+      --rouge: #C0392B;
+      --creme: #ffffff;
+      --texte: #1C1C1C;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--creme);
+      color: var(--texte);
+      -webkit-text-size-adjust: 100%;
+    }
+    /* ── Typographie ───────────────────────────── */
+    .font-display { font-family: 'Playfair Display', serif; }
+    /* ── Couleurs utilitaires ──────────────────── */
+    .bg-or    { background-color: var(--or); }
+    .bg-vert  { background-color: var(--vert); }
+    .text-or  { color: var(--or); }
+    .text-vert{ color: var(--vert); }
+    .text-rouge{ color: var(--rouge); }
+    .border-or{ border-color: var(--or); }
+    /* ── Boutons ───────────────────────────────── */
+    .btn-primary {
+      background: var(--vert); color: white;
+      padding: .75rem 1.5rem; border-radius: 8px;
+      font-weight: 600; transition: all .2s;
+      display: inline-flex; align-items: center; justify-content: center;
+      text-decoration: none; min-height: 44px;
+      border: none; cursor: pointer; font-size: 1rem;
+    }
+    .btn-primary:hover { background: #174060; box-shadow: 0 4px 12px rgba(32,82,120,.4); }
+    .btn-primary:active { transform: scale(.98); }
+    .btn-or {
+      background: var(--or); color: white;
+      padding: .75rem 1.5rem; border-radius: 8px;
+      font-weight: 600; transition: all .2s;
+      display: inline-flex; align-items: center; justify-content: center;
+      text-decoration: none; min-height: 44px;
+      border: none; cursor: pointer; font-size: 1rem;
+    }
+    .btn-or:hover  { background: #d1a81f; }
+    .btn-or:active { transform: scale(.98); }
+    .btn-outline {
+      border: 2px solid var(--vert); color: var(--vert);
+      padding: .65rem 1.4rem; border-radius: 8px;
+      font-weight: 600; transition: all .2s;
+      display: inline-flex; align-items: center; justify-content: center;
+      text-decoration: none; min-height: 44px;
+      background: transparent; cursor: pointer; font-size: 1rem;
+    }
+    .btn-outline:hover { background: var(--vert); color: white; }
+    /* ── Cartes ────────────────────────────────── */
+    .card {
+      background: white; border-radius: 14px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.06);
+      transition: transform .2s, box-shadow .2s;
+      overflow: hidden;
+    }
+    @media (hover: hover) {
+      .card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.10); }
+    }
+    /* ── Badges ────────────────────────────────── */
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 999px;
+      font-size: .72rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    }
+    .badge-habits      { background: #EEF6FF; color: #1D5A8E; }
+    .badge-alimentation{ background: #FFF3E0; color: #7C4A00; }
+    .badge-cosmetique  { background: #FBF0FF; color: #6A1F8A; }
+    .badge-argent      { background: #FFFAEB; color: #7B5C00; }
+    .badge-volontariat { background: #F5F5F5; color: #205278; }
+    /* ── Flash ─────────────────────────────────── */
+    .flash-success { background:#D1FAE5; color:#065F46; border-left:4px solid #059669; }
+    .flash-danger  { background:#FEE2E2; color:#7F1D1D; border-left:4px solid #DC2626; }
+    .flash-warning { background:#FEF3C7; color:#78350F; border-left:4px solid #D97706; }
+    /* ── Formulaires (mobile-friendly) ─────────── */
+    .form-input {
+      width: 100%; padding: .75rem 1rem; border-radius: 8px;
+      border: 1.5px solid #E5E7EB; background: white;
+      font-size: 1rem;
+      transition: border-color .15s, box-shadow .15s;
+      outline: none; font-family: inherit;
+    }
+    .form-input:focus { border-color: var(--vert); box-shadow: 0 0 0 3px rgba(32,82,120,.15); }
+    .form-label { display: block; font-weight: 600; margin-bottom: .4rem; font-size: .9rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B3A2A' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+    /* ── Navigation mobile ─────────────────────── */
+    .nav-link { transition: color .15s; min-height: 44px; display: flex; align-items: center; }
+    .nav-link:hover { color: var(--or); }
+    /* Menu mobile overlay */
+    #mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,.45); backdrop-filter: blur(3px);
+    }
+    #mobile-menu.open { display: block; }
+    #mobile-menu-panel {
+      position: absolute; top: 0; right: 0;
+      width: min(320px, 85vw); height: 100%;
+      background: white; padding: 1.5rem;
+      transform: translateX(100%); transition: transform .28s cubic-bezier(.4,0,.2,1);
+      overflow-y: auto;
+    }
+    #mobile-menu.open #mobile-menu-panel { transform: translateX(0); }
+    /* ── Bottom nav (mobile) ───────────────────── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; border-top: 1px solid #E5E7EB;
+      display: flex; z-index: 50;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .bottom-nav a {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: .6rem .25rem .5rem;
+      font-size: .65rem; font-weight: 600; color: #6B7280;
+      text-decoration: none; transition: color .15s; gap: 3px;
+      min-height: 56px;
+    }
+    .bottom-nav a.active, .bottom-nav a:hover { color: var(--vert); }
+    .bottom-nav svg { width: 22px; height: 22px; }
+    /* ── Hero pattern ──────────────────────────── */
+    .hero-pattern {
+      background-image: repeating-linear-gradient(45deg,
+        rgba(212,160,23,.07) 0, rgba(212,160,23,.07) 1px,
+        transparent 0, transparent 50%);
+      background-size: 20px 20px;
+    }
+    /* ── Utilitaires responsive ────────────────── */
+    .page-wrap  { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+    .section-gap { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+    @media (min-width: 768px) {
+      .section-gap { padding-top: 4rem; padding-bottom: 4rem; }
+      .page-wrap  { padding: 0 2rem; }
+    }
+    @media (max-width: 767px) {
+      main { padding-bottom: 72px; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ══ NAVBAR ══════════════════════════════════════════════════════════ -->
+  <header class="bg-vert text-white shadow-md sticky top-0 z-40">
+    <div class="page-wrap flex items-center justify-between h-14">
+      <a href="{{ url_for('main.index') }}" class="font-display text-xl font-bold tracking-tight">
+        Ñu andd jëf<span class="text-or">SN</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <a href="{{ url_for('dons.habits') }}"      class="nav-link"> Habits</a>
+        <a href="{{ url_for('dons.produits') }}"    class="nav-link"> Produits</a>
+        <a href="{{ url_for('dons.argent') }}"      class="nav-link"> Argent</a>
+        <a href="{{ url_for('volontariat.index') }}" class="nav-link"> Volontariat</a>
+      </nav>
+      <div class="hidden md:flex items-center gap-3 text-sm">
+        {% if current_user.is_authenticated %}
+          <span class="text-white/70">{{ current_user.nom }}</span>
+          <a href="{{ url_for('auth.deconnexion') }}" class="btn-outline" style="padding:.4rem 1rem; font-size:.85rem;">Déconnexion</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}"       class="nav-link">Connexion</a>
+          <a href="{{ url_for('auth.inscription') }}" class="btn-or" style="padding:.5rem 1.1rem; font-size:.9rem;">S'inscrire</a>
+        {% endif %}
+      </div>
+      <button id="burger-btn" class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10" aria-label="Menu">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ══ MENU MOBILE ══════════════════════════════════════════════════════ -->
+  <div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu de navigation">
+    <div id="mobile-menu-panel">
+      <div class="flex items-center justify-between mb-6">
+        <span class="font-display text-xl font-bold"><span class="text-vert">Ñu andd jëf</span><span class="text-or">SN</span></span>
+        <button id="close-menu" aria-label="Fermer le menu"
+          class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 text-xl">✕</button>
+      </div>
+
+      {% if current_user.is_authenticated %}
+        <div class="bg-gray-50 rounded-xl p-3 mb-5 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-vert flex items-center justify-center text-white font-bold text-sm">
+            {{ current_user.nom[0].upper() }}
+          </div>
+          <div>
+            <div class="font-semibold text-sm">{{ current_user.nom }}</div>
+            <a href="{{ url_for('auth.mon_espace') }}" class="text-xs text-vert">Mon espace →</a>
+          </div>
+        </div>
+      {% endif %}
+
+      <nav class="flex flex-col gap-1">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider px-2 mb-1">Dons</p>
+        <a href="{{ url_for('dons.habits') }}"      class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 font-medium text-gray-700">
+          <span class="text-xl">👕</span> Habits
+        </a>
+        <a href="{{ url_for('dons.produits') }}"    class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 font-medium text-gray-700">
+          <span class="text-xl">🛍</span> Produits
+        </a>
+        <a href="{{ url_for('dons.argent') }}"      class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 font-medium text-gray-700">
+          <span class="text-xl">💰</span> Argent
+        </a>
+
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider px-2 mb-1 mt-4">Engagement</p>
+        <a href="{{ url_for('volontariat.index') }}" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 font-medium text-gray-700">
+          <span class="text-xl">🤝</span> Volontariat
+        </a>
+        <a href="{{ url_for('dons.creer_annonce') }}" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 font-medium text-gray-700">
+          <span class="text-xl">📢</span> Publier un don
+        </a>
+      </nav>
+
+      <div class="mt-6 pt-6 border-t border-gray-100 flex flex-col gap-3">
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('auth.deconnexion') }}" class="btn-outline w-full text-center">Déconnexion</a>
+        {% else %}
+          <a href="{{ url_for('auth.inscription') }}" class="btn-primary w-full text-center">S'inscrire</a>
+          <a href="{{ url_for('auth.login') }}"       class="btn-outline w-full text-center">Connexion</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FLASH MESSAGES ══════════════════════════════════════════════════ -->
+  <div class="page-wrap mt-3 w-full">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash-{{ category }} rounded-xl px-4 py-3 mb-2 text-sm flex items-start gap-2">
+          {% if category == 'success' %}✅{% elif category == 'danger' %}❌{% else %}⚠️{% endif %}
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+
+  <!-- ══ CONTENU ══════════════════════════════════════════════════════════ -->
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ══ FOOTER (masqué sur mobile, remplacé par bottom-nav) ════════════ -->
+  <footer class="bg-vert text-white mt-16 hidden md:block">
+    <div class="page-wrap py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div>
+        <div class="font-display text-2xl font-bold mb-2">Ñu andd jëf<span class="text-or">SN</span></div>
+        <p class="text-gray-400 text-sm">Centraliser la solidarité au Sénégal.</p>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-3 text-or">Dons</h4>
+        <ul class="space-y-1 text-sm text-gray-300">
+          <li><a href="{{ url_for('dons.habits') }}"   class="hover:text-white">Habits</a></li>
+          <li><a href="{{ url_for('dons.produits') }}" class="hover:text-white">Produits</a></li>
+          <li><a href="{{ url_for('dons.argent') }}"   class="hover:text-white">Argent</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-3 text-or">Agir</h4>
+        <ul class="space-y-1 text-sm text-gray-300">
+          <li><a href="{{ url_for('volontariat.index') }}"  class="hover:text-white">Volontariat</a></li>
+          <li><a href="{{ url_for('dons.creer_annonce') }}" class="hover:text-white">Publier un don</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-3 text-or">Contact</h4>
+        <p class="text-sm text-gray-300">contact@nuanddjef.sn</p>
+        <p class="text-sm text-gray-300">Dakar, Sénégal</p>
+      </div>
+    </div>
+    <div class="border-t border-gray-700 text-center py-4 text-xs text-gray-400">
+      © 2025 Ñu andd jëf — Projet étudiant
+    </div>
+  </footer>
+
+  <!-- ══ BOTTOM NAV (mobile uniquement) ══════════════════════════════════ -->
+  <nav class="bottom-nav md:hidden" aria-label="Navigation principale">
+    <a href="{{ url_for('main.index') }}" class="{% if request.endpoint == 'main.index' %}active{% endif %}">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9.75L12 3l9 6.75V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.75z"/><path d="M9 21V12h6v9"/></svg>
+      Accueil
+    </a>
+    <a href="{{ url_for('dons.habits') }}" class="{% if 'dons' in (request.endpoint or '') %}active{% endif %}">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>
+      Dons
+    </a>
+    <a href="{{ url_for('dons.creer_annonce') }}" class="relative">
+      <div class="absolute -top-4 bg-vert rounded-full w-12 h-12 flex items-center justify-center shadow-lg">
+        <svg class="text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="24" height="24"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <span class="mt-4">Publier</span>
+    </a>
+    <a href="{{ url_for('volontariat.index') }}" class="{% if 'volontariat' in (request.endpoint or '') %}active{% endif %}">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Bénévolat
+    </a>
+    <a href="{{ url_for('auth.mon_espace') if current_user.is_authenticated else url_for('auth.login') }}"
+       class="{% if 'auth' in (request.endpoint or '') %}active{% endif %}">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      {% if current_user.is_authenticated %}Moi{% else %}Connexion{% endif %}
+    </a>
+  </nav>
+
+  <!-- ══ JS MENU BURGER ══════════════════════════════════════════════════ -->
+  <script>
+    const menu   = document.getElementById('mobile-menu');
+    const panel  = document.getElementById('mobile-menu-panel');
+    const burger = document.getElementById('burger-btn');
+    const close  = document.getElementById('close-menu');
+
+    function openMenu() {
+      menu.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      panel.focus?.();
+    }
+    function closeMenu() {
+      menu.classList.remove('open');
+      document.body.style.overflow = '';
+      burger.focus();
+    }
+    burger.addEventListener('click', openMenu);
+    close.addEventListener('click', closeMenu);
+    menu.addEventListener('click', e => { if (e.target === menu) closeMenu(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

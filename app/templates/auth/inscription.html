@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Inscription — BarakaSN{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap flex justify-center">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="text-4xl mb-3">🌱</div>
+      <h1 class="font-display text-2xl font-bold">Rejoignez BarakaSN</h1>
+      <p class="text-gray-500 text-sm mt-1">Créez votre compte en quelques secondes</p>
+    </div>
+    <div class="card p-6 md:p-8">
+      <form method="POST" action="{{ url_for('auth.inscription') }}" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="nom">Nom complet</label>
+          <input class="form-input" type="text" id="nom" name="nom"
+                 placeholder="Aminata Diallo" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Adresse email</label>
+          <input class="form-input" type="email" id="email" name="email"
+                 placeholder="vous@exemple.sn" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Mot de passe</label>
+          <input class="form-input" type="password" id="password" name="password"
+                 placeholder="8 caractères minimum" required autocomplete="new-password" minlength="8">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Je souhaite principalement…</label>
+          <div class="grid grid-cols-2 gap-2 mt-1">
+            <label class="role-option flex items-center gap-2 border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-vert transition-colors has-[:checked]:border-vert has-[:checked]:bg-green-50">
+              <input type="radio" name="role" value="donateur" checked class="accent-vert">
+              <span class="text-sm font-medium">🎁 Donner</span>
+            </label>
+            <label class="role-option flex items-center gap-2 border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-vert transition-colors has-[:checked]:border-vert has-[:checked]:bg-green-50">
+              <input type="radio" name="role" value="benevole" class="accent-vert">
+              <span class="text-sm font-medium">🤝 Bénévoler</span>
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary w-full mt-2">Créer mon compte</button>
+      </form>
+    </div>
+    <p class="text-center text-sm text-gray-500 mt-4">
+      Déjà un compte ?
+      <a href="{{ url_for('auth.login') }}" class="text-vert font-semibold hover:underline">Se connecter</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

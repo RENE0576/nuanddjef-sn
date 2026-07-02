@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Dons en argent — BarakaSN{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap">
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="font-display text-2xl md:text-3xl font-bold">💰 Faire un don en argent</h1>
+      <p class="text-gray-500 text-sm mt-1">Structures vérifiées — Orange Money & Wave acceptés</p>
+    </div>
+  </div>
+
+  <!-- Filtres types de structures -->
+  <div class="flex gap-2 overflow-x-auto pb-2 mb-6 snap-x">
+    {% set types = [('', 'Toutes'), ('daara', '📖 Daara'), ('ecole', '🏫 École'), ('hopital', '🏥 Hôpital'), ('mosquee', '🕌 Mosquée'), ('ong', '🤲 ONG')] %}
+    {% for val, label in types %}
+    <a href="{{ url_for('dons.argent', type=val) }}"
+       class="shrink-0 snap-start px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all
+              {% if filtre == val %}bg-vert border-vert text-white{% else %}bg-white border-gray-200 text-gray-600 hover:border-vert{% endif %}">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Grille structures -->
+  {% if structures %}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {% for structure in structures %}
+    <div class="card p-5 flex flex-col gap-4" id="structure-{{ structure.id }}">
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-xl bg-yellow-50 flex items-center justify-center text-2xl shrink-0">
+          {% if structure.type == 'daara' %}📖
+          {% elif structure.type == 'ecole' %}🏫
+          {% elif structure.type == 'hopital' %}🏥
+          {% elif structure.type == 'mosquee' %}🕌
+          {% else %}🤲{% endif %}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h3 class="font-bold text-gray-800">{{ structure.nom }}</h3>
+            {% if structure.verifie %}
+              <span class="badge bg-green-100 text-green-700">✅ Vérifié</span>
+            {% endif %}
+          </div>
+          {% if structure.localisation %}
+            <div class="text-xs text-gray-500 mt-1">📍 {{ structure.localisation }}</div>
+          {% endif %}
+          {% if structure.description %}
+            <p class="text-sm text-gray-600 mt-2 line-clamp-2">{{ structure.description }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Boutons de don -->
+      {% if structure.numero_orange_money or structure.numero_wave %}
+      <div class="border-t border-gray-50 pt-4">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Faire un don via :</p>
+        <div class="flex flex-wrap gap-2">
+          {% if structure.numero_orange_money %}
+          <button onclick="openDonModal({{ structure.id }}, '{{ structure.nom }}', 'orange_money')"
+                  class="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm border-2 border-orange-300 text-orange-700 hover:bg-orange-50 transition-colors">
+            <span class="text-lg">🟠</span> Orange Money
+          </button>
+          {% endif %}
+          {% if structure.numero_wave %}
+          <button onclick="openDonModal({{ structure.id }}, '{{ structure.nom }}', 'wave')"
+                  class="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm border-2 border-blue-300 text-blue-700 hover:bg-blue-50 transition-colors">
+            <span class="text-lg">🌊</span> Wave
+          </button>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-16">
+    <div class="text-5xl mb-4">🏛</div>
+    <p class="text-gray-500">Aucune structure disponible pour l'instant.</p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- ══ MODAL DON ════════════════════════════════════════════════════════ -->
+<div id="don-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center p-0 md:p-4">
+  <div class="bg-white rounded-t-3xl md:rounded-2xl w-full md:max-w-md p-6 shadow-2xl">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-display text-lg font-bold" id="modal-title">Faire un don</h3>
+      <button onclick="closeDonModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500">✕</button>
+    </div>
+
+    <!-- Simulation opérateur -->
+    <div id="operateur-display" class="rounded-xl p-4 mb-4 text-center">
+      <div class="text-3xl mb-1" id="operateur-icon">🟠</div>
+      <div class="font-bold" id="operateur-nom">Orange Money</div>
+      <div class="text-sm text-gray-500" id="operateur-numero">Numéro bénéficiaire : —</div>
+    </div>
+
+    <!-- Montants rapides -->
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Montant rapide (FCFA)</p>
+    <div class="grid grid-cols-4 gap-2 mb-3">
+      {% for montant in [500, 1000, 2500, 5000] %}
+      <button onclick="setMontant({{ montant }})"
+              class="montant-btn border-2 border-gray-200 rounded-xl py-2 text-sm font-bold hover:border-vert hover:bg-green-50 transition-all">
+        {{ montant }}
+      </button>
+      {% endfor %}
+    </div>
+
+    <form method="POST" id="don-form" action="">
+      <input type="hidden" name="operateur" id="input-operateur">
+      <div class="form-group">
+        <label class="form-label" for="montant-input">Ou saisissez un montant</label>
+        <input class="form-input" type="number" id="montant-input" name="montant"
+               placeholder="ex: 3000" min="100" required>
+      </div>
+      {% if not current_user.is_authenticated %}
+        <p class="text-xs text-center text-orange-600 bg-orange-50 rounded-lg p-3 mb-3">
+          ⚠️ Vous devez être <a href="{{ url_for('auth.login') }}" class="font-bold underline">connecté</a> pour enregistrer un don.
+        </p>
+      {% endif %}
+      <button type="submit" class="btn-or w-full" {% if not current_user.is_authenticated %}disabled{% endif %}>
+        Confirmer la promesse de don
+      </button>
+    </form>
+    <p class="text-xs text-gray-400 text-center mt-3">
+      ℹ️ Ceci est une promesse. Le virement reste à effectuer directement depuis votre application mobile.
+    </p>
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_js %}
+<script>
+const structures = {
+  {% for s in structures %}
+  {{ s.id }}: {
+    nom: "{{ s.nom }}",
+    orange: "{{ s.numero_orange_money or '' }}",
+    wave: "{{ s.numero_wave or '' }}"
+  },
+  {% endfor %}
+};
+
+function openDonModal(id, nom, operateur) {
+  const s = structures[id];
+  document.getElementById('modal-title').textContent = 'Don à ' + nom;
+  document.getElementById('input-operateur').value = operateur;
+  document.getElementById('don-form').action = `/dons/argent/${id}/promettre`;
+
+  if (operateur === 'orange_money') {
+    document.getElementById('operateur-display').className = 'rounded-xl p-4 mb-4 text-center bg-orange-50 border border-orange-200';
+    document.getElementById('operateur-icon').textContent = '🟠';
+    document.getElementById('operateur-nom').textContent = 'Orange Money';
+    document.getElementById('operateur-numero').textContent = 'Numéro bénéficiaire : ' + (s.orange || '—');
+  } else {
+    document.getElementById('operateur-display').className = 'rounded-xl p-4 mb-4 text-center bg-blue-50 border border-blue-200';
+    document.getElementById('operateur-icon').textContent = '🌊';
+    document.getElementById('operateur-nom').textContent = 'Wave';
+    document.getElementById('operateur-numero').textContent = 'Numéro bénéficiaire : ' + (s.wave || '—');
+  }
+  document.getElementById('don-modal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeDonModal() {
+  document.getElementById('don-modal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+function setMontant(val) {
+  document.getElementById('montant-input').value = val;
+  document.querySelectorAll('.montant-btn').forEach(b => b.classList.remove('border-vert','bg-green-50'));
+  event.target.classList.add('border-vert','bg-green-50');
+}
+document.getElementById('don-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeDonModal();
+});
+</script>
+{% endblock %}

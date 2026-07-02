@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Mon Espace — BarakaSN{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap">
+
+  <!-- En-tête profil -->
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-14 h-14 rounded-full bg-vert flex items-center justify-center text-white font-display text-2xl font-bold shrink-0">
+      {{ current_user.nom[0].upper() }}
+    </div>
+    <div>
+      <h1 class="font-display text-xl md:text-2xl font-bold">{{ current_user.nom }}</h1>
+      <span class="badge {% if current_user.role == 'admin' %}bg-yellow-100 text-yellow-800
+                          {% elif current_user.role == 'benevole' %}badge-volontariat
+                          {% else %}badge-habits{% endif %}">
+        {% if current_user.role == 'admin' %}⚙️ Admin
+        {% elif current_user.role == 'benevole' %}🤝 Bénévole
+        {% else %}🎁 Donateur{% endif %}
+      </span>
+    </div>
+  </div>
+
+  <!-- Actions rapides -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+    <a href="{{ url_for('dons.creer_annonce') }}"
+       class="card p-4 flex flex-col items-center text-center gap-2 hover:bg-green-50 transition-colors">
+      <span class="text-2xl">📢</span>
+      <span class="text-xs font-semibold text-gray-700">Publier un don</span>
+    </a>
+    <a href="{{ url_for('volontariat.index') }}"
+       class="card p-4 flex flex-col items-center text-center gap-2 hover:bg-green-50 transition-colors">
+      <span class="text-2xl">🔍</span>
+      <span class="text-xs font-semibold text-gray-700">Trouver mission</span>
+    </a>
+    <a href="{{ url_for('dons.argent') }}"
+       class="card p-4 flex flex-col items-center text-center gap-2 hover:bg-yellow-50 transition-colors">
+      <span class="text-2xl">💰</span>
+      <span class="text-xs font-semibold text-gray-700">Faire un don</span>
+    </a>
+    {% if current_user.is_admin() %}
+    <a href="{{ url_for('admin.dashboard') }}"
+       class="card p-4 flex flex-col items-center text-center gap-2 hover:bg-yellow-50 transition-colors">
+      <span class="text-2xl">⚙️</span>
+      <span class="text-xs font-semibold text-yellow-700">Admin</span>
+    </a>
+    {% else %}
+    <a href="{{ url_for('auth.deconnexion') }}"
+       class="card p-4 flex flex-col items-center text-center gap-2 hover:bg-red-50 transition-colors">
+      <span class="text-2xl">🚪</span>
+      <span class="text-xs font-semibold text-gray-500">Déconnexion</span>
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Mes annonces de dons -->
+  <div class="card p-5 md:p-6 mb-4">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display text-lg font-bold">📦 Mes annonces</h2>
+      <a href="{{ url_for('dons.creer_annonce') }}" class="text-xs text-vert font-semibold hover:underline">+ Nouvelle</a>
+    </div>
+    {% if current_user.annonces %}
+      <div class="flex flex-col divide-y divide-gray-50">
+        {% for annonce in current_user.annonces|sort(attribute='created_at', reverse=True) %}
+        <div class="flex items-center justify-between py-3 gap-3">
+          <div class="min-w-0 flex-1">
+            <a href="{{ url_for('dons.detail_annonce', id=annonce.id) }}"
+               class="font-medium text-sm text-gray-800 hover:text-vert line-clamp-1">
+              {{ annonce.titre }}
+            </a>
+            <div class="flex items-center gap-2 mt-1 flex-wrap">
+              <span class="badge badge-{{ annonce.categorie }} text-xs">{{ annonce.categorie }}</span>
+              <span class="text-xs text-gray-400">{{ annonce.created_at.strftime('%d/%m/%Y') }}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="text-xs px-2 py-1 rounded-full font-semibold
+              {% if annonce.statut == 'approuve' %}bg-green-100 text-green-700
+              {% elif annonce.statut == 'en_attente' %}bg-yellow-100 text-yellow-700
+              {% elif annonce.statut == 'termine' %}bg-gray-100 text-gray-500
+              {% else %}bg-red-100 text-red-700{% endif %}">
+              {% if annonce.statut == 'approuve' %}✅ Publiée
+              {% elif annonce.statut == 'en_attente' %}⏳ En attente
+              {% elif annonce.statut == 'termine' %}🏁 Terminée
+              {% else %}❌ Rejetée{% endif %}
+            </span>
+            {% if annonce.statut in ['approuve', 'en_attente'] %}
+            <form method="POST" action="{{ url_for('dons.supprimer_annonce', id=annonce.id) }}"
+                  onsubmit="return confirm('Supprimer cette annonce ?')">
+              <button type="submit" class="text-xs text-red-400 hover:text-red-600 px-1">🗑</button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-8">
+        <p class="text-sm text-gray-500 mb-3">Vous n'avez pas encore publié d'annonce.</p>
+        <a href="{{ url_for('dons.creer_annonce') }}" class="btn-primary text-sm">Publier ma première annonce</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Mes promesses de dons -->
+  {% if current_user.promesses %}
+  <div class="card p-5 md:p-6 mb-4">
+    <h2 class="font-display text-lg font-bold mb-4">💰 Mes promesses de dons</h2>
+    <div class="flex flex-col divide-y divide-gray-50">
+      {% for p in current_user.promesses|sort(attribute='created_at', reverse=True) %}
+      <div class="flex items-center justify-between py-3 gap-3">
+        <div>
+          <div class="font-medium text-sm text-gray-800">{{ p.structure.nom }}</div>
+          <div class="text-xs text-gray-400 mt-1">
+            {{ p.operateur.replace('_',' ')|title }} · {{ p.created_at.strftime('%d/%m/%Y') }}
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <div class="font-bold text-vert text-sm">{{ "{:,.0f}".format(p.montant) }} FCFA</div>
+          <span class="text-xs px-2 py-0.5 rounded-full
+            {% if p.statut == 'effectue' %}bg-green-100 text-green-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">
+            {{ 'Effectué' if p.statut == 'effectue' else 'Promesse' }}
+          </span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Mes candidatures bénévoles -->
+  <div class="card p-5 md:p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display text-lg font-bold">🤝 Mes candidatures</h2>
+      <a href="{{ url_for('volontariat.index') }}" class="text-xs text-vert font-semibold hover:underline">Voir missions</a>
+    </div>
+    {% if current_user.candidatures %}
+      <div class="flex flex-col divide-y divide-gray-50">
+        {% for cand in current_user.candidatures|sort(attribute='created_at', reverse=True) %}
+        <div class="flex items-center justify-between py-3 gap-3">
+          <div class="min-w-0 flex-1">
+            <a href="{{ url_for('volontariat.detail', mission_id=cand.mission.id) }}"
+               class="font-medium text-sm text-gray-800 hover:text-vert line-clamp-1">
+              {{ cand.mission.titre }}
+            </a>
+            <div class="text-xs text-gray-500 mt-0.5">{{ cand.mission.structure.nom }}</div>
+            <div class="text-xs text-gray-400">{{ cand.created_at.strftime('%d/%m/%Y') }}</div>
+          </div>
+          <span class="text-xs px-2 py-1 rounded-full font-semibold shrink-0
+            {% if cand.statut == 'accepte' %}bg-green-100 text-green-700
+            {% elif cand.statut == 'en_attente' %}bg-yellow-100 text-yellow-700
+            {% else %}bg-red-100 text-red-700{% endif %}">
+            {% if cand.statut == 'accepte' %}✅ Acceptée
+            {% elif cand.statut == 'en_attente' %}⏳ En attente
+            {% else %}❌ Refusée{% endif %}
+          </span>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-8">
+        <p class="text-sm text-gray-500 mb-3">Vous n'avez postulé à aucune mission.</p>
+        <a href="{{ url_for('volontariat.index') }}" class="btn-outline text-sm">Voir les missions</a>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

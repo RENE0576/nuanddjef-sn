@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Localisations — BarakaSN Admin{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap">
+
+  <div class="flex items-center gap-3 mb-6">
+    <a href="{{ url_for('admin.dashboard') }}" class="text-gray-400 hover:text-vert">← Admin</a>
+    <span class="text-gray-300">/</span>
+    <h1 class="font-display text-xl font-bold">Localisations au Sénégal</h1>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Formulaire ajout -->
+    <div class="card p-6">
+      <h2 class="font-semibold mb-4">➕ Ajouter une localisation</h2>
+      <form method="POST" action="{{ url_for('admin.ajouter_localisation') }}" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="region">Région *</label>
+          <select class="form-input" id="region" name="region" required>
+            <option value="">-- Choisir --</option>
+            {% for r in ['Dakar','Thiès','Diourbel','Fatick','Kaolack','Kaffrine','Kolda','Louga','Matam','Saint-Louis','Sédhiou','Tambacounda','Ziguinchor','Kédougou'] %}
+            <option value="{{ r }}">{{ r }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="ville">Ville / Commune *</label>
+          <input class="form-input" type="text" id="ville" name="ville"
+                 placeholder="ex: Mbour, Thiès, Touba…" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="quartier">Quartier (optionnel)</label>
+          <input class="form-input" type="text" id="quartier" name="quartier"
+                 placeholder="ex: Médina, Plateau, HLM…">
+        </div>
+        <button type="submit" class="btn-primary w-full">Ajouter</button>
+      </form>
+    </div>
+
+    <!-- Liste localisations -->
+    <div class="card p-6">
+      <h2 class="font-semibold mb-4">📍 Localisations enregistrées ({{ localisations|length }})</h2>
+      {% if localisations %}
+      <div class="flex flex-col gap-2 max-h-96 overflow-y-auto">
+        {% set current_region = namespace(val='') %}
+        {% for loc in localisations %}
+          {% if loc.region != current_region.val %}
+            {% set current_region.val = loc.region %}
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-3 first:mt-0">{{ loc.region }}</div>
+          {% endif %}
+          <div class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 group">
+            <div>
+              <span class="text-sm font-medium text-gray-800">{{ loc.ville }}</span>
+              {% if loc.quartier %}
+                <span class="text-xs text-gray-500"> · {{ loc.quartier }}</span>
+              {% endif %}
+            </div>
+            <form method="POST" action="{{ url_for('admin.supprimer_localisation', id=loc.id) }}"
+                  onsubmit="return confirm('Supprimer cette localisation ?')">
+              <button type="submit"
+                      class="opacity-0 group-hover:opacity-100 text-xs text-red-400 hover:text-red-600 transition-all px-2 py-1 rounded">
+                🗑
+              </button>
+            </form>
+          </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        <p class="text-sm text-gray-500 text-center py-6">Aucune localisation ajoutée.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

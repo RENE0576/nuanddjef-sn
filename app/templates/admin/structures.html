@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Structures — BarakaSN Admin{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap">
+
+  <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+    <div class="flex items-center gap-3">
+      <a href="{{ url_for('admin.dashboard') }}" class="text-gray-400 hover:text-vert">← Admin</a>
+      <span class="text-gray-300">/</span>
+      <h1 class="font-display text-xl font-bold">Structures partenaires</h1>
+    </div>
+    <a href="{{ url_for('admin.ajouter_structure') }}" class="btn-primary text-sm">+ Ajouter une structure</a>
+  </div>
+
+  <!-- Grille structures -->
+  {% if structures %}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {% for s in structures %}
+    <div class="card p-5 flex flex-col gap-3">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-xl shrink-0">
+            {% if s.type == 'daara' %}📖{% elif s.type == 'ecole' %}🏫{% elif s.type == 'hopital' %}🏥{% elif s.type == 'mosquee' %}🕌{% else %}🤲{% endif %}
+          </div>
+          <div>
+            <div class="font-bold text-gray-800">{{ s.nom }}</div>
+            <div class="text-xs text-gray-500 capitalize">{{ s.type }}{% if s.localisation %} · {{ s.localisation.ville }}{% endif %}</div>
+          </div>
+        </div>
+        <span class="badge {% if s.verifie %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-500{% endif %} shrink-0">
+          {% if s.verifie %}✅ Vérifié{% else %}En attente{% endif %}
+        </span>
+      </div>
+
+      {% if s.description %}
+        <p class="text-sm text-gray-600 line-clamp-2">{{ s.description }}</p>
+      {% endif %}
+
+      <div class="flex flex-wrap gap-2 text-xs">
+        {% if s.numero_orange_money %}<span class="bg-orange-50 text-orange-700 px-2 py-1 rounded-lg font-medium">🟠 {{ s.numero_orange_money }}</span>{% endif %}
+        {% if s.numero_wave %}<span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg font-medium">🌊 {{ s.numero_wave }}</span>{% endif %}
+        {% if s.contact %}<span class="bg-gray-50 text-gray-600 px-2 py-1 rounded-lg">📞 {{ s.contact }}</span>{% endif %}
+      </div>
+
+      <div class="pt-3 border-t border-gray-50 flex justify-end">
+        <form method="POST" action="{{ url_for('admin.supprimer_structure', id=s.id) }}"
+              onsubmit="return confirm('Supprimer {{ s.nom }} ? Cette action est irréversible.')">
+          <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-semibold px-3 py-1 rounded-lg hover:bg-red-50 transition-colors">
+            🗑 Supprimer
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-16">
+    <div class="text-5xl mb-3">🏛</div>
+    <p class="text-gray-500 mb-4">Aucune structure ajoutée pour l'instant.</p>
+    <a href="{{ url_for('admin.ajouter_structure') }}" class="btn-primary">Ajouter la première structure</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

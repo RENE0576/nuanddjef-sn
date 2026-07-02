@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Volontariat — Ñu andd jëfSN{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap">
+
+  <div class="mb-6">
+    <h1 class="font-display text-2xl md:text-3xl font-bold">🤝 Missions de volontariat</h1>
+    <p class="text-gray-500 text-sm mt-1">{{ missions|length }} mission{{ 's' if missions|length != 1 }} disponible{{ 's' if missions|length != 1 }}</p>
+  </div>
+
+  <!-- Filtres localisation -->
+  <div class="card p-4 mb-6">
+    <form method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div>
+        <label class="form-label text-xs">Région</label>
+        <select class="form-input" name="region" onchange="this.form.submit()">
+          <option value="">Toutes les régions</option>
+          {% for region in regions %}
+            <option value="{{ region }}" {% if filtres.region == region %}selected{% endif %}>{{ region }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="form-label text-xs">Ville</label>
+        <input class="form-input" type="text" name="ville" placeholder="ex: Mbour"
+               value="{{ filtres.ville }}">
+      </div>
+      <div>
+        <label class="form-label text-xs">Quartier</label>
+        <input class="form-input" type="text" name="quartier" placeholder="ex: Médina"
+               value="{{ filtres.quartier }}">
+      </div>
+      <div class="sm:col-span-3 flex gap-2">
+        <button type="submit" class="btn-primary flex-1">🔍 Filtrer</button>
+        <a href="{{ url_for('volontariat.index') }}" class="btn-outline px-4">✕ Réinitialiser</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Liste des missions -->
+  {% if missions %}
+  <div class="flex flex-col gap-4">
+    {% for mission in missions %}
+    <a href="{{ url_for('volontariat.detail', mission_id=mission.id) }}" class="card p-5 flex flex-col md:flex-row gap-4 hover:no-underline block">
+      <div class="w-full md:w-14 flex md:flex-col items-center justify-start gap-3 md:gap-0">
+        <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center text-2xl shrink-0">🤝</div>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <h3 class="font-bold text-gray-800">{{ mission.titre }}</h3>
+          {% if mission.places_disponibles > 0 %}
+            <span class="badge badge-volontariat">{{ mission.places_disponibles }} place{{ 's' if mission.places_disponibles != 1 }}</span>
+          {% else %}
+            <span class="badge bg-red-100 text-red-700">Complet</span>
+          {% endif %}
+        </div>
+        <div class="text-sm font-medium text-vert mb-1">{{ mission.structure.nom }}</div>
+        {% if mission.localisation %}
+          <div class="text-xs text-gray-500 mb-2">📍 {{ mission.localisation }}</div>
+        {% endif %}
+        {% if mission.description %}
+          <p class="text-sm text-gray-600 line-clamp-2">{{ mission.description }}</p>
+        {% endif %}
+        {% if mission.competences_requises %}
+          <div class="text-xs text-gray-500 mt-2">🎯 {{ mission.competences_requises }}</div>
+        {% endif %}
+      </div>
+      <div class="flex md:flex-col items-center md:items-end justify-between md:justify-start gap-2 shrink-0">
+        {% if mission.date_debut %}
+          <div class="text-xs text-gray-400 text-right">
+            📅 {{ mission.date_debut.strftime('%d/%m/%Y') }}
+            {% if mission.date_fin %} → {{ mission.date_fin.strftime('%d/%m/%Y') }}{% endif %}
+          </div>
+        {% endif %}
+        <span class="btn-primary text-xs py-2 px-4">Postuler →</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-16">
+    <div class="text-5xl mb-4">🌍</div>
+    <h3 class="font-semibold text-gray-700 mb-2">Aucune mission disponible</h3>
+    <p class="text-gray-500 text-sm">Essayez de modifier vos filtres de localisation.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

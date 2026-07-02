@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Ajouter une structure — Admin{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap flex justify-center">
+  <div class="w-full max-w-xl">
+
+    <div class="flex items-center gap-3 mb-7">
+      <a href="{{ url_for('admin.structures') }}" class="text-gray-400 hover:text-vert text-sm">← Retour</a>
+      <span class="text-gray-300">/</span>
+      <h1 class="font-display text-xl font-bold">Ajouter une structure</h1>
+    </div>
+
+    <div class="card p-6 md:p-8">
+      <form method="POST" action="{{ url_for('admin.ajouter_structure') }}" novalidate>
+
+        <div class="form-group">
+          <label class="form-label" for="nom">Nom de la structure *</label>
+          <input class="form-input" type="text" id="nom" name="nom"
+                 placeholder="ex: Daara Serigne Touba" required maxlength="200">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Type de structure *</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {% for val, icon, label in [('daara','📖','Daara'), ('ecole','🏫','École'), ('hopital','🏥','Hôpital'), ('mosquee','🕌','Mosquée'), ('ong','🤲','ONG'), ('autre','🏠','Autre')] %}
+            <label class="flex items-center gap-2 border-2 border-gray-200 rounded-xl p-3 cursor-pointer transition-all hover:border-vert has-[:checked]:border-vert has-[:checked]:bg-green-50">
+              <input type="radio" name="type" value="{{ val }}" class="accent-vert" required>
+              <span class="text-sm font-medium">{{ icon }} {{ label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">Description</label>
+          <textarea class="form-input" id="description" name="description" rows="3"
+                    placeholder="Décrivez brièvement la structure et son action…"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="contact">Contact (téléphone / email)</label>
+          <input class="form-input" type="text" id="contact" name="contact"
+                 placeholder="+221 77 000 0000">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="localisation_id">Localisation</label>
+          <select class="form-input" id="localisation_id" name="localisation_id">
+            <option value="">-- Choisir --</option>
+            {% for loc in localisations %}
+            <option value="{{ loc.id }}">{{ loc }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="bg-orange-50 rounded-xl p-4 mb-5">
+          <p class="text-sm font-semibold text-orange-800 mb-3">💳 Numéros de paiement mobile</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="form-label text-xs">🟠 Numéro Orange Money</label>
+              <input class="form-input" type="text" name="numero_orange_money"
+                     placeholder="ex: 771234567">
+            </div>
+            <div>
+              <label class="form-label text-xs">🌊 Numéro Wave</label>
+              <input class="form-input" type="text" name="numero_wave"
+                     placeholder="ex: 781234567">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary w-full">✅ Enregistrer la structure</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

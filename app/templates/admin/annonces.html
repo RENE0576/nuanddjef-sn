@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Modération — BarakaSN Admin{% endblock %}
+{% block content %}
+<div class="page-wrap section-gap">
+
+  <div class="flex items-center gap-3 mb-6">
+    <a href="{{ url_for('admin.dashboard') }}" class="text-gray-400 hover:text-vert">← Admin</a>
+    <span class="text-gray-300">/</span>
+    <h1 class="font-display text-xl font-bold">Modération des annonces</h1>
+  </div>
+
+  <!-- Onglets statut -->
+  <div class="flex gap-2 overflow-x-auto pb-2 mb-6">
+    {% for s, label in [('en_attente','⏳ En attente'), ('approuve','✅ Approuvées'), ('rejete','❌ Rejetées')] %}
+    <a href="{{ url_for('admin.annonces', statut=s) }}"
+       class="shrink-0 px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all
+              {% if statut_filtre == s %}bg-vert border-vert text-white{% else %}bg-white border-gray-200 text-gray-600{% endif %}">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  {% if annonces %}
+  <div class="flex flex-col gap-3">
+    {% for annonce in annonces %}
+    <div class="card p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+      <div class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <span class="badge badge-{{ annonce.categorie }}">{{ annonce.categorie }}</span>
+          {% if annonce.sous_categorie %}<span class="text-xs text-gray-500">{{ annonce.sous_categorie }}</span>{% endif %}
+          <span class="text-xs text-gray-400">{{ annonce.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+        </div>
+        <div class="font-semibold text-gray-800">{{ annonce.titre }}</div>
+        <div class="text-xs text-gray-500 mt-1">👤 {{ annonce.auteur.nom }} — {{ annonce.auteur.email }}</div>
+        {% if annonce.description %}
+          <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ annonce.description }}</p>
+        {% endif %}
+      </div>
+
+      {% if statut_filtre == 'en_attente' %}
+      <div class="flex gap-2 shrink-0">
+        <form method="POST" action="{{ url_for('admin.approuver_annonce', id=annonce.id) }}">
+          <button type="submit" class="btn-primary text-sm py-2 px-4">✅ Approuver</button>
+        </form>
+        <form method="POST" action="{{ url_for('admin.rejeter_annonce', id=annonce.id) }}">
+          <button type="submit" class="text-sm py-2 px-4 rounded-lg border-2 border-red-200 text-red-600 hover:bg-red-50 font-semibold">❌ Rejeter</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-12 text-gray-500">
+    <div class="text-4xl mb-3">🎉</div>
+    <p>Aucune annonce dans cette catégorie.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
